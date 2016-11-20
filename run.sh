@@ -28,7 +28,7 @@ set -o errexit
 
 # Script requires root for access to /etc/hosts
 if [ "$EUID" -ne 0 ]
-  then printf "Please run as ${RED}root${NC} using ${YELLOW}sudo ./update-hosts.sh${NC}\n\n"
+  then printf "Please run as ${RED}root${NC} using ${YELLOW}sudo ./run.sh${NC}\n\n"
   exit
 fi
 
