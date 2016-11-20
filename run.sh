@@ -26,15 +26,6 @@ NC='\033[0m'
 
 set -o errexit
 
-# Script requires root for access to /etc/hosts
-if [ "$EUID" -ne 0 ]
-  then printf "Please run as ${RED}root${NC} using ${YELLOW}sudo ./run.sh${NC}\n\n"
-  exit
-fi
-
-# If no args are specified, show the readme
-if [ -z "$*" ]; then readme; fi
-
 # Will attempt to undo the changes made by the script to the /etc/hosts file
 function undo {
   
@@ -137,6 +128,15 @@ ${RECORDS}" >> /etc/hosts
   fi
   exit
 }
+
+# Script requires root for access to /etc/hosts
+if [ "$EUID" -ne 0 ]
+  then printf "Please run as ${RED}root${NC} using ${YELLOW}sudo ./run.sh${NC}\n\n"
+  exit
+fi
+
+# If no args are specified, show the readme
+if [ -z "$*" ]; then readme; exit; fi
 
 # CLI Arguments Handler
 for i in "$@"
