@@ -32,6 +32,38 @@ if [ "$EUID" -ne 0 ]
 fi
 
 function undo {
+  
+  UNDO_FILE=$(cat backups/latest.txt)
+  UNDO_HOSTS=$(cat ./backups/${UNDO_FILE})
+  
+  printf "Uninstalling ${HOSTS_DATA_FILE} from ${HOSTS} with ${UNDO_FILE} backup"
+  
+  PREVIOUS_BACKUP=$(find ./backups/* -type f -name '*.bak' -not -name "${UNDO_FILE}" | sort -r -k1 | head -1)
+    
+  if [ "${PREVIOUS_BACKUP}" == "" ]
+  then 
+    printf "\nno backup found...\n"
+    uninstall
+  else     
+    cat /etc/hosts > "./backups/hosts_${NOW}.undone"
+    echo "${UNDO_HOSTS}" > /etc/hosts
+  
+    rm -f ./backups/latest.txt
+    cat $PREVIOUS_BACKUP > ./backups/latest.txt
+  fi
+  
+  printf " ${GREEN}✓${NC}\n\n"
+  exit
+}
+
+function uninstall {
+  printf "Uninstalling hosts-blocking from the system"
+  cat ./backups/original.txt > /etc/hosts
+  rm -f ./backups/*.bak
+  rm -f ./backups/*.undone
+  rm -f ./backups/*.txt
+  printf " ${GREEN}✓${NC}\n\n"
+  
   exit
 }
 
@@ -69,6 +101,9 @@ function readme {
   printf "    Revert to the previous state of your hosts file\n"
   printf "    ${RED}sudo ./run.sh --undo${NC}\n"
   printf "\n"
+  printf "    Uninstalls the entire script and reverts to original\n"
+  printf "    ${RED}sudo ./run.sh --uninstall${NC}\n"
+  printf "\n"
   printf "    Revert your hosts file to a stored backup by name\n"
   printf "    ${RED}sudo ./run.sh --revert-to=YYYYMMDD@HHMMSS${NC}\n"
   printf "\n\n"
@@ -91,6 +126,8 @@ function install {
     printf "Installing ${HOSTS_DATA_FILE} inside of ${HOSTS_FILE}..."
   
     cat ${HOSTS_FILE} >> ./backups/hosts_${NOW}.bak
+    
+    cat ${HOSTS_FILE} >> ./backups/original.txt
   
     echo "hosts_${NOW}.bak" > ./backups/latest.txt
   
@@ -130,6 +167,10 @@ case $i in
     ;;
     -u|--undo)
     undo
+    shift # past argument=value
+    ;;
+    --uninstall)
+    uninstall
     shift # past argument=value
     ;;
     -rt=*|--revert-to=*)
