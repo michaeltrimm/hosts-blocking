@@ -25,4 +25,4 @@ Revert to the previous state of your hosts file
 
 Revert your hosts file to a stored backup by name
   
-    sudo ./run.sh --revert-to=YYYYMMDD@HHMMSS
+[See backups/README.md](backups/README.md)

@@ -26,11 +26,13 @@ NC='\033[0m'
 
 set -o errexit
 
+# Script requires root for access to /etc/hosts
 if [ "$EUID" -ne 0 ]
   then printf "Please run as ${RED}root${NC} using ${YELLOW}sudo ./update-hosts.sh${NC}\n\n"
   exit
 fi
 
+# Will attempt to undo the changes made by the script to the /etc/hosts file
 function undo {
   
   UNDO_FILE=$(cat backups/latest.txt)
@@ -56,6 +58,7 @@ function undo {
   exit
 }
 
+# Reverts the /etc/hosts file to the ./backups/original.txt
 function uninstall {
   printf "Uninstalling hosts-blocking from the system"
   cat ./backups/original.txt > /etc/hosts
@@ -63,14 +66,10 @@ function uninstall {
   rm -f ./backups/*.undone
   rm -f ./backups/*.txt
   printf " ${GREEN}✓${NC}\n\n"
-  
   exit
 }
 
-function revertto {
-  exit
-}
-
+# The help menu and readme for the script (see README.md and backups/README.md)
 function readme {
 
   printf "Hosts Blocking Helper Script\n"
@@ -103,13 +102,11 @@ function readme {
   printf "\n"
   printf "    Uninstalls the entire script and reverts to original\n"
   printf "    ${RED}sudo ./run.sh --uninstall${NC}\n"
-  printf "\n"
-  printf "    Revert your hosts file to a stored backup by name\n"
-  printf "    ${RED}sudo ./run.sh --revert-to=YYYYMMDD@HHMMSS${NC}\n"
   printf "\n\n"
 
 }
 
+# Installation
 function install {
   
   # Boundary is generated based on when the _hosts.txt file is generated
@@ -121,43 +118,26 @@ function install {
 
   if [ "${EXISTING}" == "" ]
   then
-  
-    # Not yet installed
     printf "Installing ${HOSTS_DATA_FILE} inside of ${HOSTS_FILE}..."
-  
-    cat ${HOSTS_FILE} >> ./backups/hosts_${NOW}.bak
     
+    cat ${HOSTS_FILE} >> ./backups/hosts_${NOW}.bak
     cat ${HOSTS_FILE} >> ./backups/original.txt
-  
     echo "hosts_${NOW}.bak" > ./backups/latest.txt
-  
     RECORDS="$(cat ${HOSTS_DATA_FILE})"
-  
     echo "
 ${RECORDS}" >> /etc/hosts
-  
     CHECK=$(sed -n "/\\${BOUNDARY1}/,/\\${BOUNDARY1}/p" ${HOSTS_FILE})
     if [ "${CHECK}" == "" ]
     then printf " ${RED}X${NC}\n\n"
     else printf " ${GREEN}✓${NC}\n\n"
     fi
-  
-    exit
-
   else
-  
     printf "${RED}Already installed ${HOSTS_DATA_FILE} hosts inside ${HOSTS_FILE}!\n\n"
-    exit
-
   fi
-  
+  exit
 }
 
-
-
-REVERTTO=""
-
-
+# CLI Arguments Handler
 for i in "$@"
 do
 case $i in
@@ -173,10 +153,6 @@ case $i in
     uninstall
     shift # past argument=value
     ;;
-    -rt=*|--revert-to=*)
-    REVERTTO="${i#*=}"
-    shift # past argument=value
-    ;;
     -h|--help)
     readme
     shift # past argument with no value
@@ -186,4 +162,5 @@ case $i in
 esac
 done
 
-
+# Always end positive
+exit 1
