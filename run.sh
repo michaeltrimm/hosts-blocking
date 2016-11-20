@@ -32,6 +32,9 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+# If no args are specified, show the readme
+if [ -z "$*" ]; then readme; fi
+
 # Will attempt to undo the changes made by the script to the /etc/hosts file
 function undo {
   
@@ -71,9 +74,7 @@ function uninstall {
 
 # The help menu and readme for the script (see README.md and backups/README.md)
 function readme {
-
   printf "Hosts Blocking Helper Script\n"
-  
   printf "\n${GREEN}"
   printf "██╗  ██╗███████╗██╗     ██████╗ \n"
   printf "██║  ██║██╔════╝██║     ██╔══██╗\n"
@@ -103,7 +104,7 @@ function readme {
   printf "    Uninstalls the entire script and reverts to original\n"
   printf "    ${RED}sudo ./run.sh --uninstall${NC}\n"
   printf "\n\n"
-
+  exit
 }
 
 # Installation
@@ -141,23 +142,24 @@ ${RECORDS}" >> /etc/hosts
 for i in "$@"
 do
 case $i in
-    -i|--install)
+    --install)
     install
-    shift # past argument=value
+    shift
     ;;
-    -u|--undo)
+    --undo)
     undo
-    shift # past argument=value
+    shift
     ;;
     --uninstall)
     uninstall
-    shift # past argument=value
+    shift
     ;;
     -h|--help)
     readme
-    shift # past argument with no value
+    shift
     ;;
     *)
+    readme
     ;;
 esac
 done
