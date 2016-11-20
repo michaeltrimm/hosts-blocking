@@ -8,6 +8,37 @@ Small utility that syncronizes the hosts.txt file to the /etc/hosts file.
 
 3. A file named `latest.txt` is created with the contents of the newly created `.bak` file from #2
 
+## Installation
+
+### Prerequisites 
+
+System requirements: `git` `bash` and `sudo`
+
+#### Install GIT
+
+*macOS*: Install `git` via `Homebrew`
+
+    brew install git
+    
+*Ubuntu*: Install `git` via `apt-get`
+
+    sudo apt-get install git
+
+*CentOS/RHEL*: Install `git` via `yum`
+
+    sudo yum install git
+
+Manually download `git`
+
+    https://git-scm.com/
+
+### Install
+
+From your command line application like `Terminal` or `iTerm2` run the following: 
+
+    git clone https://github.com/michaeltrimm/hosts-blocking.git
+    cd hosts-blocking
+    sudo ./run.sh --install
 
 ## Usage:
 
