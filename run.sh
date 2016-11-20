@@ -97,7 +97,7 @@ function install {
     RECORDS="$(cat ${HOSTS_DATA_FILE})"
   
     echo "
-  ${RECORDS}" >> /etc/hosts
+${RECORDS}" >> /etc/hosts
   
     CHECK=$(sed -n "/\\${BOUNDARY1}/,/\\${BOUNDARY1}/p" ${HOSTS_FILE})
     if [ "${CHECK}" == "" ]
